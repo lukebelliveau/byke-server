@@ -7,11 +7,15 @@ const url = 'https://feeds.divvybikes.com/stations/stations.json';
 
 const schema = buildSchema(`
   type Query {
-    hello: String
     allStations: [Station]
   }
   
   type Station {
+    id: ID,
+    stationName: String,
+    availableDocks: Int,
+    totalDocks: Int,
+    availableBikes: Int,
     latitude: Float,
     longitude: Float,
   }
