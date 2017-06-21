@@ -52,7 +52,7 @@ const getDivvyStationByIndex = (index) => rawDivvyData['stationBeanList'][index]
 
 const getAllDivvyStations = () => rawDivvyData['stationBeanList']
 
-app.listen(app.get('port'), () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log(`Now browse to localhost:${app.get('port')}/graphiql`);
   getRawDivvyData();
 });
