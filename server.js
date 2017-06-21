@@ -38,6 +38,7 @@ var resolvers = {
 
 var schema = makeExecutableSchema({typeDefs, resolvers});
 var app = express();
+app.set('port', (process.env.PORT || 4000));
 app.use('/graphql', bodyParser.json(), graphqlExpress({schema}));
 app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql'}));
 
@@ -51,7 +52,7 @@ const getDivvyStationByIndex = (index) => rawDivvyData['stationBeanList'][index]
 
 const getAllDivvyStations = () => rawDivvyData['stationBeanList']
 
-app.listen(4000, () => {
-  console.log('Now browse to localhost:4000/graphiql');
+app.listen(app.get('port'), () => {
+  console.log(`Now browse to localhost:${app.get('port')}/graphiql`);
   getRawDivvyData();
 });
