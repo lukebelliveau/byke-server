@@ -3,14 +3,21 @@ var bodyParser = require('body-parser');
 var fetch = require('node-fetch');
 var { graphqlExpress, graphiqlExpress } = require('graphql-server-express');
 var { makeExecutableSchema } = require('graphql-tools');
+var GraphQLJSON = require('graphql-type-json');
 
 let rawDivvyData = '';
 
 var typeDefs = [`
+
+scalar JSON
+
 type Query {
-  hello(name: String): String
-  rawData: String
-  station(index: Int): String
+  allStations: [Station]
+}
+
+type Station {
+  latitude: Float
+  longitude: Float
 }
 
 schema {
@@ -19,16 +26,14 @@ schema {
 
 var resolvers = {
   Query: {
-    hello(root, args) {
-      return args.name;
-    },
-    rawData() {
-      return rawDivvyData;
-    },
-    station(obj, args) {
-      return getDivvyStationByIndex(args.index);
+    allStations() {
+      const rawStations = getAllDivvyStations();
+      const stations = rawStations.map(station => ({ latitude: station.latitude, longitude: station.longitude }))
+      return stations
     }
-  }
+  },
+
+  JSON: GraphQLJSON
 };
 
 var schema = makeExecutableSchema({typeDefs, resolvers});
@@ -43,6 +48,8 @@ const getRawDivvyData = () =>
   .then(json => rawDivvyData = json))
 
 const getDivvyStationByIndex = (index) => rawDivvyData['stationBeanList'][index];
+
+const getAllDivvyStations = () => rawDivvyData['stationBeanList']
 
 app.listen(4000, () => {
   console.log('Now browse to localhost:4000/graphiql');
