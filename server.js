@@ -1,9 +1,15 @@
 var express = require('express');
 const { graphql, buildSchema } = require('graphql');
 const graphqlHTTP = require('express-graphql');
-var fetch = require('node-fetch');
 
-const url = 'https://feeds.divvybikes.com/stations/stations.json';
+var getStations = require('./fetcher');
+
+let stations = [];
+
+const refreshStations = () =>
+  getStations().then(returnedStations =>
+    stations = returnedStations
+  );
 
 const schema = buildSchema(`
   type Query {
@@ -23,9 +29,7 @@ const schema = buildSchema(`
 
 const root = {
   allStations: () => {
-    return fetch(url)
-      .then(response => response.json()
-        .then(json => json['stationBeanList']))
+    return stations;
   }
 }
 
@@ -38,4 +42,6 @@ app.use('/graphql', graphqlHTTP({
 
 app.listen(process.env.PORT || 4000, () => {
   console.log('Started graphQL server!');
+  refreshStations();
+  setInterval(refreshStations, 10000)
 });
